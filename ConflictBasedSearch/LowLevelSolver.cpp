@@ -84,8 +84,11 @@ Cell LowLevelSolver::findMinCostCell(const std::vector<Cell> &OPEN) {
 	Cell min_cell;
 	int min_value = INT_MAX;
 
+	// std::cout << "OPEN LIST length: " << OPEN.size() << std::endl;
+
 	for (Cell c : OPEN)
 	{
+		// std::cout << "cell: " << c.x << "," << c.y << "; value: " << c.f << std::endl;
 		if (c.f < min_value)
 		{
 			min_value = c.f;
@@ -125,8 +128,10 @@ inline int LowLevelSolver::findIndex(std::vector<Cell> cells, Cell cell) {
 // for each agent find optimal path
 std::vector<std::vector<Cell>> LowLevelSolver::findOptimalPaths(const std::vector<Constraint> &constraints, const Map &map) {
 	
+	std::cout << "Number of agents: " << map.agents.size() << std::endl;
 	for (auto k = 0; k < map.agents.size(); k++) {
 		optimalPaths.emplace_back(solve(constraints, map, k));
+		std::cout << "Agent " << k << " path size: " << optimalPaths[k].size() << std::endl;
 
 	}
 	return optimalPaths;
@@ -149,9 +154,13 @@ std::vector<Cell> LowLevelSolver::solve(const std::vector<Constraint> &constrain
 	checkStartGoalCells(current_cell, goal, map);
 	OPEN.push_back(current_cell);
 
+	std::cout << "Agent " << agentID << " start: " << start.x << "," << start.y << std::endl;
+
 	while (!(findMinCostCell(OPEN) == goal)) {
 		current_cell = findMinCostCell(OPEN);
 		current_cell.parent = findParent(OPEN);
+		std::cout << "Agent " << agentID << " current cell: " << current_cell.x << "," << current_cell.y << std::endl;
+		std::cout << "Agent " << agentID << " goal: " << goal.x << "," << goal.y << std::endl;
 		if (!OPEN.empty()) {
 			OPEN.erase(std::min_element(OPEN.begin(), OPEN.end(), compareF));
 		}
@@ -276,15 +285,16 @@ std::vector<Cell> LowLevelSolver::solve(const std::vector<Constraint> &constrain
 
 	for (auto elem : optimalPath)
 	{
-		std::cout << elem.x << " " << elem.y << "\n";
+		// std::cout << elem.x << " " << elem.y << "\n";
 	}
-	std::cout << " \n \n";
+	// std::cout << " \n \n";
 
 	path.clear();
 	OPEN.clear();
 	CLOSE.clear();
 	std::reverse(optimalPath.begin(), optimalPath.end());
 	//return updatePath(optimalPath, constraints);
+	std::cout << "optimal path size: " << optimalPath.size() << std::endl;
 	return optimalPath;
 }
 

@@ -23,7 +23,7 @@ Map readMap(std::string filename) {
 	std::ifstream infile(filename);
 	std::string line;
 
-	getline(infile, line);
+	getline(infile, line); 
 
 	auto splitted = split(line, ' ');
 	row = std::stoi(splitted[0]);
@@ -41,7 +41,7 @@ Map readMap(std::string filename) {
 
 		std::vector<Cell> row;
 		for (int j = 0; j < col; j++) {
-			row.emplace_back(Cell(i, j));
+			row.emplace_back(Cell(j, i));
 		}
 		cells.emplace_back(row);
 	};
@@ -49,10 +49,10 @@ Map readMap(std::string filename) {
 	while (getline(k, s, ' ')) {
 
 		int obstacleIndex = std::stoi(s);
-		int x = obstacleIndex % row;
-		int y = obstacleIndex / row;
+		int x = obstacleIndex % col;
+		int y = obstacleIndex / col;
 
-		cells[x][y].isObstacle = true;
+		cells[y][x].isObstacle = true;
 	}
 
 	// next lines are agents. startIndex endIndex
@@ -63,11 +63,11 @@ Map readMap(std::string filename) {
 	int agentID = 0;
 	while (infile >> start >> end) {
 
-		int startX = start % row;
-		int startY = start / row;
+		int startX = start % col;
+		int startY = start / col;
 
-		int endX = end % row;
-		int endY = end / row;
+		int endX = end % col;
+		int endY = end / col;
 
 		Agent agent(agentID);
 		agent.start = Cell(startX, startY);
@@ -86,8 +86,9 @@ Map readMap(std::string filename) {
 void printMap(Map map) {
 	for (int i = 0; i < map.cells.size(); i++) {
 		for (int j = 0; j < map.cells[0].size(); j++) {
-			if (map.cells[j][i].isObstacle)
+			if (map.cells[i][j].isObstacle){
 				std::cout << "X";
+			}
 			else
 				std::cout << "_";
 		}
@@ -130,21 +131,29 @@ void printSolution(std::vector<std::vector<Cell>> optimalPaths) {
 }
 
 
-int main() {
-    auto started = std::chrono::high_resolution_clock::now();
-
+std::vector<std::vector<Cell>> find_path() {
 	std::vector<std::vector<Cell>> optimalPaths;
-	Map map = readMap("data\\map3.txt");
-	printMap(map);
+	std::vector<Cell> shoretstPath;
+	Map map = readMap("data/map.txt");
+	// printMap(map);
 	HighLevelSolver solver;
 	optimalPaths = solver.solve(map);
-	printSolution(optimalPaths);
-
-    auto done = std::chrono::high_resolution_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(done-started).count();
-
-    std::cout << elapsedTime << " milliseconds " ;
-
-    return 0;
+	// printSolution(optimalPaths);
+	return optimalPaths;
 }
+
+
+// int main() {
+//     auto started = std::chrono::high_resolution_clock::now();
+
+// 	std::vector<std::vector<Cell>> optimalPaths;
+// 	optimalPaths = find_path();
+
+//     auto done = std::chrono::high_resolution_clock::now();
+//     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(done-started).count();
+
+//     std::cout << elapsedTime << " milliseconds " ;
+
+//     return 0;
+// }
 
